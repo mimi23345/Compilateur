@@ -52,6 +52,6 @@ public class Token {
         NEWLINE, COMMENT, ERROR, EOF,
         
         // === Personnalisés ===
-        BENOUADFEL, Yacine, RANGE
+         RANGE
     }
 }

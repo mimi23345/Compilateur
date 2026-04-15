@@ -4,359 +4,277 @@ import java.io.*;
 import java.util.List;
 
 public class CompilerGUI extends JFrame {
-
     private JTextArea codeArea;
     private JTextArea resultArea;
     private JPanel mainPanel;
     private JPanel welcomePanel;
+    private JLabel statusBar;
 
-    // 🎨 Palette de couleurs - BLEU ET GRIS
-    private static final Color DARK_GRAY = new Color(40, 40, 40);
-    private static final Color MEDIUM_GRAY = new Color(60, 60, 60);
-    private static final Color LIGHT_GRAY = new Color(80, 80, 80);
-    private static final Color BLUE_ACCENT = new Color(33, 150, 243);    // Bleu principal
-    private static final Color BLUE_DARK = new Color(25, 118, 210);      // Bleu foncé
-    private static final Color BLUE_HOVER = new Color(66, 165, 245);     // Bleu hover
-    private static final Color WHITE = new Color(240, 240, 240);
-    private static final Color BLACK_TEXT = Color.BLACK;                 // Texte noir pour boutons
+    // Thème sombre professionnel
+    private static final Color BG_DARK = new Color(28, 28, 30);
+    private static final Color BG_PANEL = new Color(40, 40, 45);
+    private static final Color BG_EDITOR = new Color(35, 35, 38);
+    private static final Color ACCENT = new Color(59, 130, 246);
+    private static final Color SUCCESS = new Color(34, 197, 94);
+    private static final Color ERROR = new Color(239, 68, 68);
+    private static final Color TEXT_LIGHT = new Color(220, 220, 225);
+    private static final Color TEXT_DIM = new Color(156, 163, 175);
 
     public CompilerGUI() {
-        setTitle("🔷 Mini Compilateur Python");
-        setSize(1000, 700);
+        setTitle("Mini Compilateur Python");
+        setSize(1100, 750);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
-
-        // Initialiser les panneaux
+        setMinimumSize(new Dimension(800, 500));
         createWelcomePanel();
         createMainPanel();
-
-        // Afficher l'écran de bienvenue au démarrage
         setContentPane(welcomePanel);
         setVisible(true);
     }
 
-    /**
-     * Crée l'écran de bienvenue
-     */
     private void createWelcomePanel() {
         welcomePanel = new JPanel(new BorderLayout());
-        welcomePanel.setBackground(DARK_GRAY);
+        welcomePanel.setBackground(BG_DARK);
 
-        // 🎨 Header avec logo - BLEU
         JPanel header = new JPanel();
-        header.setBackground(BLUE_ACCENT);
-        header.setPreferredSize(new Dimension(1000, 100));
-        
-        JLabel logo = new JLabel("🔷 MINI-COMPILATEUR PYTHON", SwingConstants.CENTER);
-        logo.setFont(new Font("Segoe UI", Font.BOLD, 26));
-        logo.setForeground(Color.WHITE);
-        header.add(logo);
+        header.setBackground(ACCENT);
+        header.setPreferredSize(new Dimension(1000, 80));
+        JLabel title = new JLabel("MINI-COMPILATEUR PYTHON", SwingConstants.CENTER);
+        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setForeground(Color.WHITE);
+        header.add(title);
 
-        // 💬 Message de bienvenue
-        JPanel welcomeContent = new JPanel();
-        welcomeContent.setBackground(DARK_GRAY);
-        welcomeContent.setLayout(new BoxLayout(welcomeContent, BoxLayout.Y_AXIS));
+        JPanel center = new JPanel();
+        center.setBackground(BG_DARK);
+        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
 
-        JLabel welcomeTitle = new JLabel(" Bonjour et bienvenue !", SwingConstants.CENTER);
-        welcomeTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        welcomeTitle.setForeground(BLUE_ACCENT);
-        welcomeTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-        welcomeTitle.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
+        JLabel welcome = new JLabel("Bienvenue", SwingConstants.CENTER);
+        welcome.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        welcome.setForeground(ACCENT);
+        welcome.setAlignmentX(Component.CENTER_ALIGNMENT);
+        welcome.setBorder(BorderFactory.createEmptyBorder(40, 0, 10, 0));
 
-        JLabel welcomeText = new JLabel("<html><div style='text-align: center; color: white; font-size: 15px; line-height: 1.8;'>" +
-                "Vous utilisez le <b>Mini-Compilateur Python</b><br>" +
-                "Développé dans le cadre du module <b>Compilation</b><br>" +
-                "Université A/Mira de Béjaïa - Département d'Informatique</div></html>", SwingConstants.CENTER);
-        welcomeText.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        welcomeText.setAlignmentX(Component.CENTER_ALIGNMENT);
-        welcomeText.setBorder(BorderFactory.createEmptyBorder(10, 50, 30, 50));
+        JLabel desc = new JLabel("<html><div style='text-align:center; color:#a0a5b0; font-size:15px; line-height:1.7;'>"+
+                "Analyse lexicale & syntaxique d'un sous-ensemble Python.<br>"+
+                "Developpe pour le module <b>Compilation</b> | Universite A/Mira de Bejaia</div></html>", SwingConstants.CENTER);
+        desc.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+        desc.setBorder(BorderFactory.createEmptyBorder(10, 40, 30, 40));
 
-        // 👥 Équipe de développement
-        JLabel teamTitle = new JLabel(" Réalisé par :", SwingConstants.CENTER);
-        teamTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        teamTitle.setForeground(WHITE);
-        teamTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel team = new JLabel("<html><div style='text-align:center; color:#8b949e; font-size:13px; line-height:1.6;'>"+
+                "Equipe : Khereddine Amira | Hedjres Tesnim | Mechtaoui Tarek</div></html>", SwingConstants.CENTER);
+        team.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        team.setAlignmentX(Component.CENTER_ALIGNMENT);
+        team.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
-        JLabel teamNames = new JLabel("<html><div style='text-align: center; color: " + 
-                toHex(BLUE_ACCENT) + "; font-size: 17px; font-weight: bold; line-height: 2.2;'>" +
-                "• Khereddine Amira<br>" +
-                "• Hedjres Tesnim<br>" +
-                "• Mechtaoui Tarek</div></html>", SwingConstants.CENTER);
-        teamNames.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        teamNames.setAlignmentX(Component.CENTER_ALIGNMENT);
-        teamNames.setBorder(BorderFactory.createEmptyBorder(10, 0, 40, 0));
+        JButton startBtn = createButton("DEMMARRER L'ENVIRONNEMENT", ACCENT, Color.WHITE, 220, 45);
+        startBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        startBtn.addActionListener(e -> startCompilation());
 
-        // 🚀 Bouton "Commencer" - TEXTE NOIR
-        JButton startButton = new JButton(" CLIQUER ICI POUR COMMENCER");
-        styleStartButton(startButton);
-        startButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        startButton.addActionListener(e -> startCompilation());
-
-        welcomeContent.add(welcomeTitle);
-        welcomeContent.add(welcomeText);
-        welcomeContent.add(teamTitle);
-        welcomeContent.add(teamNames);
-        welcomeContent.add(startButton);
+        center.add(welcome);
+        center.add(desc);
+        center.add(team);
+        center.add(startBtn);
 
         welcomePanel.add(header, BorderLayout.NORTH);
-        welcomePanel.add(welcomeContent, BorderLayout.CENTER);
-
-        // 📝 Footer
-        JLabel footer = new JLabel("© 2026 - Projet Compilation - ING3", SwingConstants.CENTER);
-        footer.setFont(new Font("Segoe UI", Font.ITALIC, 11));
-        footer.setForeground(LIGHT_GRAY);
-        footer.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        welcomePanel.add(footer, BorderLayout.SOUTH);
+        welcomePanel.add(center, BorderLayout.CENTER);
     }
 
-    /**
-     * Crée le panneau principal de compilation
-     */
     private void createMainPanel() {
         mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(DARK_GRAY);
+        mainPanel.setBackground(BG_DARK);
 
-        // 🔥 Header - BLEU
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(BLUE_ACCENT);
-        
-        JLabel title = new JLabel("  COMPILATEUR PYTHON ", SwingConstants.CENTER);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        title.setForeground(Color.WHITE);
-        title.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        header.add(title, BorderLayout.CENTER);
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        toolbar.setBackground(BG_PANEL);
+        toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(60,60,65)));
 
-        // Bouton retour accueil
-        JButton backBtn = new JButton(" Accueil");
-        backBtn.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        backBtn.setBackground(MEDIUM_GRAY);
-        backBtn.setForeground(BLACK_TEXT);  // ✅ TEXTE NOIR
-        backBtn.setFocusPainted(false);
-        backBtn.setBorder(BorderFactory.createEmptyBorder(5, 12, 5, 12));
-        backBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        backBtn.addActionListener(e -> showWelcome());
-        header.add(backBtn, BorderLayout.EAST);
+        JLabel logo = new JLabel(">> COMPILATEUR");
+        logo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        logo.setForeground(ACCENT);
 
-        // ✍ Zone de code
-        codeArea = new JTextArea();
-        codeArea.setFont(new Font("Consolas", Font.PLAIN, 13));
-        codeArea.setBackground(MEDIUM_GRAY);
-        codeArea.setForeground(WHITE);
-        codeArea.setCaretColor(BLUE_ACCENT);
-        codeArea.setLineWrap(true);
-        codeArea.setWrapStyleWord(true);
-
-        JScrollPane codeScroll = new JScrollPane(codeArea);
-        codeScroll.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(BLUE_ACCENT, 2),
-                " 📝 Code Source ",
-                0, 0,
-                new Font("Segoe UI", Font.BOLD, 12),
-                BLUE_ACCENT
-        ));
-
-        // 📋 Zone de résultats
-        resultArea = new JTextArea();
-        resultArea.setFont(new Font("Consolas", Font.PLAIN, 12));
-        resultArea.setEditable(false);
-        resultArea.setBackground(DARK_GRAY);
-        resultArea.setForeground(BLUE_ACCENT);
-        resultArea.setLineWrap(true);
-        resultArea.setWrapStyleWord(true);
-
-        JScrollPane resultScroll = new JScrollPane(resultArea);
-        resultScroll.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(BLUE_ACCENT, 2),
-                "  Résultat de la Compilation ",
-                0, 0,
-                new Font("Segoe UI", Font.BOLD, 12),
-                BLUE_ACCENT
-        ));
-
-        // 🎛 Panneau de boutons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 8));
-        buttonPanel.setBackground(DARK_GRAY);
-
-        // ✅ Boutons avec TEXTE NOIR
-        JButton compileBtn = createStyledButton("⚡ Compiler", BLUE_ACCENT, BLACK_TEXT);
-        JButton loadBtn = createStyledButton(" Charger Fichier", LIGHT_GRAY, BLACK_TEXT);
-        JButton clearBtn = createStyledButton(" Effacer", new Color(200, 60, 60), BLACK_TEXT);
+        JButton compileBtn = createButton("COMPILER", SUCCESS, Color.WHITE, 110, 34);
+        JButton loadBtn = createButton("CHARGER", ACCENT, Color.WHITE, 100, 34);
+        JButton clearBtn = createButton("EFFACER", ERROR, Color.WHITE, 100, 34);
+        JButton backBtn = createButton("<- ACCUEIL", new Color(70,70,75), TEXT_LIGHT, 100, 34);
 
         compileBtn.addActionListener(e -> compilerCode());
         loadBtn.addActionListener(e -> chargerFichier());
-        clearBtn.addActionListener(e -> {
-            codeArea.setText("");
-            resultArea.setText("");
-        });
+        clearBtn.addActionListener(e -> { codeArea.setText(""); resultArea.setText(""); updateStatus("Pret"); });
+        backBtn.addActionListener(e -> { setContentPane(welcomePanel); revalidate(); repaint(); });
 
-        buttonPanel.add(compileBtn);
-        buttonPanel.add(loadBtn);
-        buttonPanel.add(clearBtn);
+        toolbar.add(logo);
+        toolbar.add(Box.createHorizontalStrut(20));
+        toolbar.add(compileBtn);
+        toolbar.add(loadBtn);
+        toolbar.add(clearBtn);
+        toolbar.add(Box.createHorizontalGlue());
+        toolbar.add(backBtn);
 
-        // 🧩 Split pane pour code/résultats
+        codeArea = new JTextArea();
+        codeArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+        codeArea.setBackground(BG_EDITOR);
+        codeArea.setForeground(TEXT_LIGHT);
+        codeArea.setCaretColor(ACCENT);
+        codeArea.setLineWrap(true);
+        codeArea.setWrapStyleWord(true);
+        codeArea.setMargin(new Insets(10, 10, 10, 10));
+        JScrollPane codeScroll = new JScrollPane(codeArea);
+        codeScroll.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(60,60,65), 2), " CODE SOURCE ", 0, 0, new Font("Segoe UI", Font.BOLD, 12), TEXT_DIM));
+
+        resultArea = new JTextArea();
+        resultArea.setFont(new Font("Consolas", Font.PLAIN, 13));
+        resultArea.setEditable(false);
+        resultArea.setBackground(new Color(22, 22, 24));
+        resultArea.setForeground(TEXT_DIM);
+        resultArea.setLineWrap(true);
+        resultArea.setWrapStyleWord(true);
+        resultArea.setMargin(new Insets(10, 10, 10, 10));
+        JScrollPane resultScroll = new JScrollPane(resultArea);
+        resultScroll.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(60,60,65), 2), " CONSOLE DE COMPILATION ", 0, 0, new Font("Segoe UI", Font.BOLD, 12), TEXT_DIM));
+
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, codeScroll, resultScroll);
-        split.setDividerLocation(320);
-        split.setResizeWeight(0.5);
-        split.setBackground(DARK_GRAY);
+        split.setDividerLocation(450);
+        split.setResizeWeight(0.6);
+        split.setBorder(null);
+        split.setDividerSize(6);
+        split.setBackground(BG_DARK);
 
-        mainPanel.add(header, BorderLayout.NORTH);
+        statusBar = new JLabel("Pret");
+        statusBar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        statusBar.setForeground(TEXT_DIM);
+        statusBar.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        statusBar.setBackground(new Color(30,30,33));
+        statusBar.setOpaque(true);
+
+        mainPanel.add(toolbar, BorderLayout.NORTH);
         mainPanel.add(split, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        mainPanel.add(statusBar, BorderLayout.SOUTH);
     }
 
-    /**
-     * Style pour le bouton de démarrage - TEXTE NOIR
-     */
-    private void styleStartButton(JButton button) {
-        button.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        button.setBackground(BLUE_ACCENT);
-        button.setForeground(BLACK_TEXT);  // ✅ TEXTE NOIR
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(12, 35, 12, 35));
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
-        // Effet hover
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(BLUE_HOVER);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(BLUE_ACCENT);
-            }
-        });
-    }
-
-    /**
-     * Crée un bouton stylisé - AVEC TEXTE NOIR
-     */
-    private JButton createStyledButton(String text, Color bgColor, Color textColor) {
+    private JButton createButton(String text, Color bg, Color fg, int w, int h) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        btn.setBackground(bgColor);
-        btn.setForeground(textColor);  // ✅ TEXTE NOIR
+        btn.setBackground(bg);
+        btn.setForeground(fg);
         btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        btn.setBorderPainted(false);
+        btn.setPreferredSize(new Dimension(w, h));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btn.setBackground(bgColor.brighter());
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btn.setBackground(bgColor);
-            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) { btn.setBackground(bg.darker()); }
+            public void mouseExited(java.awt.event.MouseEvent evt) { btn.setBackground(bg); }
         });
-        
         return btn;
     }
 
-    /**
-     * Affiche l'écran de bienvenue
-     */
-    private void showWelcome() {
-        setContentPane(welcomePanel);
-        revalidate();
-        repaint();
-    }
-
-    /**
-     * Démarre l'interface de compilation
-     */
     private void startCompilation() {
         setContentPane(mainPanel);
         revalidate();
         repaint();
         codeArea.requestFocus();
+        updateStatus("Environnement initialise");
     }
 
-    /**
-     * Compile le code
-     */
     private void compilerCode() {
-        resultArea.setText("");
+   
+    new Thread(() -> {
+        updateStatus("Compilation en cours...");
+        
+        SwingUtilities.invokeLater(() -> resultArea.setText(""));
         String code = codeArea.getText();
-
+        
         if (code.trim().isEmpty()) {
-            resultArea.setForeground(new Color(255, 180, 0));
-            resultArea.append(" Veuillez entrer du code à compiler !\n");
+            SwingUtilities.invokeLater(() -> {
+                resultArea.setForeground(ERROR);
+                resultArea.append("[AVERTISSEMENT] Aucun code detecte.\n");
+                updateStatus("Code vide");
+            });
             return;
         }
 
-        Lexer lexer = new Lexer(code);
-        List<Token> tokens = lexer.tokenize();
-        Parser parser = new Parser(tokens);
+        try {
+            Lexer lexer = new Lexer(code);
+            List<Token> tokens = lexer.tokenize();
+            Parser parser = new Parser(tokens);
+            boolean ok = parser.parse();
 
-        boolean syntaxe = parser.parse();
-
-        if (lexer.getErrors().isEmpty() && syntaxe) {
-            resultArea.setForeground(BLUE_ACCENT);
-            resultArea.append(" COMPILATION RÉUSSIE \n\n");
-            resultArea.append("✓ Analyse lexicale : OK\n");
-            resultArea.append("✓ Analyse syntaxique : OK\n");
-            resultArea.append("✓ Le code est valide !\n");
-        } else {
-            resultArea.setForeground(new Color(255, 80, 80));
-            resultArea.append(" COMPILATION ÉCHOUÉE \n\n");
-
-            if (!lexer.getErrors().isEmpty()) {
-                resultArea.append(" Erreurs Lexicales :\n");
-                for (String err : lexer.getErrors()) {
-                    resultArea.append("   • " + err + "\n");
+            SwingUtilities.invokeLater(() -> {
+                if (lexer.getErrors().isEmpty() && ok) {
+                    resultArea.setForeground(SUCCESS);
+                    resultArea.append("[SUCCES] COMPILATION REUSSIE\n");
+                    resultArea.append("  |- Analyse lexicale : OK\n");
+                    resultArea.append("  |- Analyse syntaxique : OK\n");
+                    resultArea.append("  └- Le code est valide.\n");
+                    
+                    resultArea.append("\n LISTE DES TOKENS :\n");
+                    resultArea.append("────────────────────────────────\n");
+                    int count = 0;
+                    for (Token token : tokens) {
+                        if (token.getType() != Token.TokenType.EOF && 
+                            token.getType() != Token.TokenType.NEWLINE) {
+                            count++;
+                            resultArea.append(String.format("  %3d. %-18s : '%s'\n", 
+                                count, token.getType(), token.getValue()));
+                        }
+                    }
+                    resultArea.append("────────────────────────────────\n");
+                    resultArea.append("Total : " + count + " token(s)\n");
+                    updateStatus("Compilation terminee (succes)");
+                } else {
+                    resultArea.setForeground(ERROR);
+                    resultArea.append("[ERREUR] COMPILATION ECHEOUEE\n\n");
+                    if (!lexer.getErrors().isEmpty()) {
+                        resultArea.append("[LEXICAL] Erreurs:\n");
+                        lexer.getErrors().forEach(e -> resultArea.append("  * " + e + "\n"));
+                    }
+                    if (!parser.getErrors().isEmpty()) {
+                        resultArea.append("[SYNTAXE] Erreurs:\n");
+                        parser.getErrors().forEach(e -> resultArea.append("  * " + e + "\n"));
+                    }
+                    updateStatus("Compilation echouee");
                 }
-                resultArea.append("\n");
-            }
-            if (!parser.getErrors().isEmpty()) {
-                resultArea.append(" Erreurs Syntaxiques :\n");
-                for (String err : parser.getErrors()) {
-                    resultArea.append("   • " + err + "\n");
-                }
-            }
+            });
+        } catch (Exception ex) {
+            SwingUtilities.invokeLater(() -> {
+                resultArea.setForeground(ERROR);
+                resultArea.append("[CRITIQUE] Erreur : " + ex.getMessage() + "\n");
+                updateStatus("Erreur d'execution");
+            });
         }
-    }
+    }).start();  
+}
 
-    /**
-     * Charge un fichier
-     */
+
     private void chargerFichier() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Sélectionner un fichier Python");
-        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-                "Fichiers Python (*.py)", "py"));
-        
-        int result = chooser.showOpenDialog(this);
-
-        if (result == JFileChooser.APPROVE_OPTION) {
+        chooser.setDialogTitle("Charger un fichier Python");
+        chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Fichiers Python (*.py)", "py"));
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 codeArea.setText("");
                 codeArea.read(br, null);
-                resultArea.setForeground(BLUE_ACCENT);
-                resultArea.setText(" Fichier '" + file.getName() + "' chargé avec succès !\n");
-            } catch (IOException e) {
-                resultArea.setForeground(new Color(255, 80, 80));
-                resultArea.setText(" Erreur de lecture : " + e.getMessage() + "\n");
+                resultArea.setForeground(ACCENT);
+                resultArea.append("[INFO] Fichier '" + file.getName() + "' charge.\n");
+                updateStatus("Fichier charge : " + file.getName());
+            } catch (IOException ex) {
+                resultArea.setForeground(ERROR);
+                resultArea.append("[ERREUR] Impossible de lire le fichier : " + ex.getMessage() + "\n");
+                updateStatus("Erreur de fichier");
             }
         }
     }
 
-    /**
-     * Convertit Color en hex pour HTML
-     */
-    private String toHex(Color c) {
-        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+    private void updateStatus(String msg) {
+        statusBar.setText("> " + msg);
     }
 
     public static void main(String[] args) {
-        // Look and feel moderne
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        SwingUtilities.invokeLater(() -> {
-            new CompilerGUI();
-        });
+        } catch (Exception ignored) {}
+        SwingUtilities.invokeLater(() -> new CompilerGUI());
     }
 }

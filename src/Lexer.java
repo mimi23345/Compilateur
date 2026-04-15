@@ -32,8 +32,6 @@ public class Lexer {
         KEYWORDS.put("not", Token.TokenType.NOT);
         KEYWORDS.put("True", Token.TokenType.BOOLEAN);
         KEYWORDS.put("False", Token.TokenType.BOOLEAN);
-        KEYWORDS.put("BENOUADFEL", Token.TokenType.BENOUADFEL);
-        KEYWORDS.put("Yacine", Token.TokenType.Yacine);
     }
 
     public Lexer(String input) {
@@ -145,7 +143,6 @@ public class Lexer {
     private Token scanOperator(int startLine, int startColumn) {
         char current = input.charAt(position);
         switch (current) {
-            // === PLUS et dérivés ===
             case '+':
                 if (peek() == '+') {
                     position += 2; column += 2;
@@ -157,8 +154,6 @@ public class Lexer {
                     position++; column++;
                     return new Token(Token.TokenType.PLUS, "+", startLine, startColumn);
                 }
-
-            // === MINUS et dérivés ===
             case '-':
                 if (peek() == '-') {
                     position += 2; column += 2;
@@ -170,8 +165,6 @@ public class Lexer {
                     position++; column++;
                     return new Token(Token.TokenType.MINUS, "-", startLine, startColumn);
                 }
-
-            // === MULTIPLY / DIVIDE / MODULO ===
             case '*':
                 position++; column++;
                 return new Token(Token.TokenType.MULTIPLY, "*", startLine, startColumn);
@@ -181,8 +174,6 @@ public class Lexer {
             case '%':
                 position++; column++;
                 return new Token(Token.TokenType.MODULO, "%", startLine, startColumn);
-
-            // === EQUAL / ASSIGN (CORRIGÉ ✅) ===
             case '=':
                 if (peek() == '=') {
                     position += 2; column += 2;
@@ -191,8 +182,6 @@ public class Lexer {
                     position++; column++;
                     return new Token(Token.TokenType.ASSIGN, "=", startLine, startColumn);
                 }
-
-            // === NOT / NOT_EQUAL (CORRIGÉ ✅) ===
             case '!':
                 if (peek() == '=') {
                     position += 2; column += 2;
@@ -201,8 +190,6 @@ public class Lexer {
                     position++; column++;
                     return new Token(Token.TokenType.NOT, "!", startLine, startColumn);
                 }
-
-            // === LESS / LESS_EQUAL (CORRIGÉ ✅) ===
             case '<':
                 if (peek() == '=') {
                     position += 2; column += 2;
@@ -211,8 +198,6 @@ public class Lexer {
                     position++; column++;
                     return new Token(Token.TokenType.LESS, "<", startLine, startColumn);
                 }
-
-            // === GREATER / GREATER_EQUAL (CORRIGÉ ✅) ===
             case '>':
                 if (peek() == '=') {
                     position += 2; column += 2;
@@ -221,8 +206,6 @@ public class Lexer {
                     position++; column++;
                     return new Token(Token.TokenType.GREATER, ">", startLine, startColumn);
                 }
-
-            // === Parenthèses / Accolades / Crochets ===
             case '(':
                 position++; column++;
                 return new Token(Token.TokenType.LPAREN, "(", startLine, startColumn);
@@ -241,8 +224,6 @@ public class Lexer {
             case ']':
                 position++; column++;
                 return new Token(Token.TokenType.RBRACKET, "]", startLine, startColumn);
-
-            // === Autres délimiteurs ===
             case ',':
                 position++; column++;
                 return new Token(Token.TokenType.COMMA, ",", startLine, startColumn);
@@ -255,13 +236,9 @@ public class Lexer {
             case '.':
                 position++; column++;
                 return new Token(Token.TokenType.DOT, ".", startLine, startColumn);
-
-            // === Nouvelle ligne ===
             case '\n':
                 position++; line++; column = 1;
                 return new Token(Token.TokenType.NEWLINE, "\\n", startLine, startColumn);
-
-            // === Caractère inconnu ===
             default:
                 position++; column++;
                 return new Token(Token.TokenType.ERROR, String.valueOf(current), startLine, startColumn);
