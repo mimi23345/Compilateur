@@ -33,7 +33,7 @@ public class Parser {
     skipNewlines();
     while (tc.getType() != Token.TokenType.EOF) {
         Statement();
-        if (!r) break; // ⬅️ COUPE LA BOUCLE DÈS LA 1ÈRE ERREUR (évite le spam infini)
+        if (!r) break; 
         skipNewlines();
     }
 }
@@ -307,9 +307,9 @@ public class Parser {
     }
       
 
-// 2️⃣ Remplace Primary() par celle-ci :
+
 private static void Primary() {
-    // ✅ FIX : Gérer range(5) ou range(1, 10, 2) avec ses parenthèses
+   
     if (tc.getType() == Token.TokenType.RANGE) {
         advance();
         if (tc.getType() == Token.TokenType.LPAREN) {
