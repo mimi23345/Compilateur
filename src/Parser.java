@@ -30,12 +30,13 @@ public class Parser {
     }
 
     private static void Program() {
+    skipNewlines();
+    while (tc.getType() != Token.TokenType.EOF) {
+        Statement();
+        if (!r) break; // ⬅️ COUPE LA BOUCLE DÈS LA 1ÈRE ERREUR (évite le spam infini)
         skipNewlines();
-        while (tc.getType() != Token.TokenType.EOF) {
-            Statement();
-            skipNewlines();
-        }
     }
+}
 
     private static void Statement() {
         skipNewlines();
@@ -226,64 +227,42 @@ public class Parser {
             skipNewlines();
         }
     }
-    
-private static void AssignmentOrExpression() {
-    if (tc.getType() == Token.TokenType.IDENTIFIER) {
-        String varName = tc.getValue();
-        int savedIndex = index; // On sauvegarde la position pour pouvoir revenir en arrière en cas d'erreur
-        advance(); 
 
-        boolean isValidUsage = false; 
-
-    
-        if (tc.getType() == Token.TokenType.ASSIGN ||
-            tc.getType() == Token.TokenType.PLUS_ASSIGN ||
-            tc.getType() == Token.TokenType.MINUS_ASSIGN) {
+    private static void AssignmentOrExpression() {
+        if (tc.getType() == Token.TokenType.IDENTIFIER) {
             advance();
-            Expression();
-            isValidUsage = true;
-        } 
-       
-        else if (tc.getType() == Token.TokenType.INCREMENT ||
-                 tc.getType() == Token.TokenType.DECREMENT) {
-            advance();
-            isValidUsage = true;
-        } 
-  
-        else {
-            while ((tc.getType() == Token.TokenType.DOT ||
-                    tc.getType() == Token.TokenType.LBRACKET ||
-                    tc.getType() == Token.TokenType.LPAREN) && r) {
-                
-                if (tc.getType() == Token.TokenType.DOT) {
-                    advance();
-                    if (tc.getType() == Token.TokenType.IDENTIFIER) advance();
-                    else error("Identifiant attendu après '.'");
-                } else if (tc.getType() == Token.TokenType.LBRACKET) {
-                    advance();
-                    Expression();
-                    match(Token.TokenType.RBRACKET, "']' attendu");
-                } else if (tc.getType() == Token.TokenType.LPAREN) {
-                    advance();
-                    ArgumentList();
-                    match(Token.TokenType.RPAREN, "')' attendu");
+            if (tc.getType() == Token.TokenType.ASSIGN ||
+                tc.getType() == Token.TokenType.PLUS_ASSIGN ||
+                tc.getType() == Token.TokenType.MINUS_ASSIGN) {
+                advance();
+                Expression();
+            } else if (tc.getType() == Token.TokenType.INCREMENT ||
+                       tc.getType() == Token.TokenType.DECREMENT) {
+                advance();
+            } else {
+                while ((tc.getType() == Token.TokenType.DOT ||
+                        tc.getType() == Token.TokenType.LBRACKET ||
+                        tc.getType() == Token.TokenType.LPAREN) && r) {
+                    
+                    if (tc.getType() == Token.TokenType.DOT) {
+                        advance();
+                        if (tc.getType() == Token.TokenType.IDENTIFIER) advance();
+                        else error("Identifiant attendu après '.'");
+                    } else if (tc.getType() == Token.TokenType.LBRACKET) {
+                        advance();
+                        Expression();
+                        match(Token.TokenType.RBRACKET, "']' attendu");
+                    } else if (tc.getType() == Token.TokenType.LPAREN) {
+                        advance();
+                        ArgumentList();
+                        match(Token.TokenType.RPAREN, "')' attendu");
+                    }
                 }
-                isValidUsage = true;
             }
+        } else {
+            error("Identifiant attendu");
         }
-
-        
-        if (!isValidUsage) {
-           
-            index = savedIndex; 
-            tc = tokens.get(index);
-            error("Instruction invalide : '" + varName + "' (Variable non définie ou mot inconnu)");
-        }
-    } else {
-        error("Identifiant attendu");
     }
-}
-  
 
     private static void Expression() { LogicalOr(); }
     private static void LogicalOr() {
@@ -326,49 +305,67 @@ private static void AssignmentOrExpression() {
             advance(); Unary();
         } else { Primary(); }
     }
-    private static void Primary() {
-        if (tc.getType() == Token.TokenType.INTEGER || tc.getType() == Token.TokenType.FLOAT ||
-            tc.getType() == Token.TokenType.STRING || tc.getType() == Token.TokenType.BOOLEAN ||
-            tc.getType() == Token.TokenType.RANGE) {
+      
+
+// 2️⃣ Remplace Primary() par celle-ci :
+private static void Primary() {
+    // ✅ FIX : Gérer range(5) ou range(1, 10, 2) avec ses parenthèses
+    if (tc.getType() == Token.TokenType.RANGE) {
+        advance();
+        if (tc.getType() == Token.TokenType.LPAREN) {
             advance();
-            return;
-        }
-        if (tc.getType() == Token.TokenType.IDENTIFIER) {
-            advance();
-            while ((tc.getType() == Token.TokenType.DOT ||
-                    tc.getType() == Token.TokenType.LBRACKET ||
-                    tc.getType() == Token.TokenType.LPAREN) && r) {
-                if (tc.getType() == Token.TokenType.DOT) {
-                    advance();
-                    if (tc.getType() == Token.TokenType.IDENTIFIER) advance();
-                    else error("Identifiant attendu après '.'");
-                } else if (tc.getType() == Token.TokenType.LBRACKET) {
-                    advance(); Expression();
-                    match(Token.TokenType.RBRACKET, "']' attendu");
-                } else if (tc.getType() == Token.TokenType.LPAREN) {
-                    advance(); ArgumentList();
-                    match(Token.TokenType.RPAREN, "')' attendu");
+            if (tc.getType() != Token.TokenType.RPAREN) {
+                Expression();
+                while (tc.getType() == Token.TokenType.COMMA && r) { 
+                    advance(); 
+                    Expression(); 
                 }
             }
-            return;
+            match(Token.TokenType.RPAREN, "')' attendu après range");
         }
-        if (tc.getType() == Token.TokenType.LPAREN) {
-            advance(); Expression();
-            match(Token.TokenType.RPAREN, "')' attendu");
-            return;
-        }
-        if (tc.getType() == Token.TokenType.LBRACKET) {
-            advance();
-            if (tc.getType() != Token.TokenType.RBRACKET) {
-                Expression();
-                while (tc.getType() == Token.TokenType.COMMA && r) { advance(); Expression(); }
-            }
-            match(Token.TokenType.RBRACKET, "']' attendu");
-            return;
-        }
-        error("Expression invalide : " + tc.getValue());
+        return;
     }
 
+    if (tc.getType() == Token.TokenType.INTEGER || tc.getType() == Token.TokenType.FLOAT ||
+        tc.getType() == Token.TokenType.STRING || tc.getType() == Token.TokenType.BOOLEAN) {
+        advance();
+        return;
+    }
+    if (tc.getType() == Token.TokenType.IDENTIFIER) {
+        advance();
+        while ((tc.getType() == Token.TokenType.DOT ||
+                tc.getType() == Token.TokenType.LBRACKET ||
+                tc.getType() == Token.TokenType.LPAREN) && r) {
+            if (tc.getType() == Token.TokenType.DOT) {
+                advance();
+                if (tc.getType() == Token.TokenType.IDENTIFIER) advance();
+                else error("Identifiant attendu après '.'");
+            } else if (tc.getType() == Token.TokenType.LBRACKET) {
+                advance(); Expression();
+                match(Token.TokenType.RBRACKET, "']' attendu");
+            } else if (tc.getType() == Token.TokenType.LPAREN) {
+                advance(); ArgumentList();
+                match(Token.TokenType.RPAREN, "')' attendu");
+            }
+        }
+        return;
+    }
+    if (tc.getType() == Token.TokenType.LPAREN) {
+        advance(); Expression();
+        match(Token.TokenType.RPAREN, "')' attendu");
+        return;
+    }
+    if (tc.getType() == Token.TokenType.LBRACKET) {
+        advance();
+        if (tc.getType() != Token.TokenType.RBRACKET) {
+            Expression();
+            while (tc.getType() == Token.TokenType.COMMA && r) { advance(); Expression(); }
+        }
+        match(Token.TokenType.RBRACKET, "']' attendu");
+        return;
+    }
+    error("Expression invalide : " + tc.getValue());
+}
     private static void ArgumentList() {
         if (tc.getType() != Token.TokenType.RPAREN) {
             Expression();

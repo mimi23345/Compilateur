@@ -32,17 +32,24 @@ Avec votre IDE (VS Code, IntelliJ, Eclipse, NetBeans...) :
 
 
 
-                Notes Importantes & Workflow de Travail:
+                          **** Notes Importantes & Workflow de Travail:*****
+        ***** TOUJOURS EFFACER AVANT UN NOUVEAU TEST
+Que vous écriviez directement dans l'éditeur, que vous colliez du code, ou que vous utilisiez le bouton "CHARGER FICHIER", il est impératif de cliquer sur "EFFACER" avant chaque nouvelle compilation.
+       
 
- Modification de fichiers sources chargés
+******* Modification de fichiers sources chargés
 
 Lorsque vous utilisez le bouton "Charger Fichier" dans l'interface :
 Le contenu du fichier .py est copié en mémoire dans la zone d'édition de l'interface.
 L'interface ne surveille pas les modifications externes du fichier.
 ** Procédure obligatoire pour prendre en compte vos changements :
 1.Modifiez et sauvegardez votre fichier .py dans votre éditeur externe.
-2.Retournez sur l'interface et cliquez sur "Charger Fichier" pour actualiser le contenu en mémoire.
-3.Cliquez enfin sur "Compiler".
+
+2.EFFACER le contenu précédent (bouton "EFFACER") avant de charger un nouveau script ou avant de relancer un test
+
+3.Retournez sur l'interface et cliquez sur "Charger Fichier" pour actualiser le contenu en mémoire.
+
+4.Cliquez enfin sur "Compiler".
 
       Sans cette étape de rechargement, le compilateur analysera l'ancienne version copiée en mémoire et ignorera vos modifications.
 
